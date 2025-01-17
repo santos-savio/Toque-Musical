@@ -1,19 +1,16 @@
-# Toque-Musical
+# toque_musical
 
-O aplicativo é uma solução simples e direta para controle de presença de alunos e acompanhamento do progresso acadêmico, desenvolvido especificamente para ser utilizado por um único professor. As principais funcionalidades incluem:
+A new Flutter project.
 
-Cadastro e Gerenciamento de Alunos e Turmas: Permite ao professor adicionar alunos ao sistema e associá-los a turmas.
+## Getting Started
 
-Criação de Aulas: O professor pode criar aulas manualmente, definindo data e duração, e adicionar anotações sobre cada aula.
+This project is a starting point for a Flutter application.
 
-Registro de Presença: Com uma interface intuitiva, é possível marcar a presença dos alunos por meio de uma única caixa de seleção e adicionar observações opcionalmente.
+A few resources to get you started if this is your first Flutter project:
 
-Geração de Relatórios: O aplicativo gera relatórios em PDF, com opções para:
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-Geral do Aluno: Resumo de aulas comparecidas, horas de curso, e justificativas de faltas e anotações de presenças.
-
-Aulas: Datas, duração, anotações e alunos presentes.
-
-Exportação de Dados: Relatórios podem ser filtrados por intervalos de datas ou exportados integralmente.
-
-A solução prioriza simplicidade, compatibilidade com dispositivos Android e rapidez no acesso às informações.
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
