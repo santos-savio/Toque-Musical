@@ -17,5 +17,3 @@ Aulas: Datas, duração, anotações e alunos presentes.
 Exportação de Dados: Relatórios podem ser filtrados por intervalos de datas ou exportados integralmente.
 
 A solução prioriza simplicidade, compatibilidade com dispositivos Android e rapidez no acesso às informações.
-
-teste sicronização clone git
