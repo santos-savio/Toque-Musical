@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 
 import '../alunos/alunos_page.dart';
 import '../turmas/turmas_page.dart';
+import '../aulas/aulas_page.dart.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -30,6 +31,8 @@ class _HomePageState extends State<HomePage> {
             'CREATE TABLE turmas(id INTEGER PRIMARY KEY, descricao TEXT)');
         db.execute(
             'CREATE TABLE alunos(id INTEGER PRIMARY KEY, nome TEXT, turmaId INTEGER)');
+        db.execute(
+            'CREATE TABLE aulas(id INTEGER PRIMARY KEY, data DATE, duracao INTEGER, anotacao STRING)');
       },
       version: 1,
     );
@@ -76,7 +79,17 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
-            _MenuCard(icon: Icons.calendar_today, label: 'Aulas'),
+            _MenuCard(icon: Icons.calendar_today,
+                label: 'Aulas',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AulasPage(),
+                  ),
+                );
+              },
+            ),
             _MenuCard(icon: Icons.bar_chart, label: 'Relatórios'),
             _MenuCard(icon: Icons.info, label: 'Sobre'),
             _MenuCard(icon: Icons.person, label: 'Professor'),
