@@ -149,7 +149,7 @@ class _EditTurmaPageState extends State<EditTurmaPage> {
             child: TextField(
               controller: _turmaDescricaoController,
               decoration:
-                  const InputDecoration(labelText: 'Descrição da Turma'),
+                  const InputDecoration(labelText: 'Nome da Turma'),
             ),
           ),
           Expanded(
