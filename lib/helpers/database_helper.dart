@@ -18,7 +18,7 @@ class DatabaseHelper {
   static Future<Database> _initializeDatabase() async {
     final path = join(await getDatabasesPath(), 'toque_musical.db');
 
-    await deleteDatabase(path);
+    //await deleteDatabase(path);
 
     return openDatabase(
       path,

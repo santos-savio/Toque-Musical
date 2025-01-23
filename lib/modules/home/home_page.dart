@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:toque_musical/modules/professor/professor_page.dart';
+import 'package:toque_musical/modules/relatorios/relatorios_page.dart';
+import 'package:toque_musical/modules/sobre/sobre_page.dart';
 
 import '../alunos/alunos_page.dart';
 import '../aulas/aulas_page.dart';
@@ -56,9 +59,42 @@ class HomePage extends StatelessWidget {
                 );
               },
             ),
-            MenuCard(icon: Icons.bar_chart, label: 'Relatórios'),
-            MenuCard(icon: Icons.info, label: 'Sobre'),
-            MenuCard(icon: Icons.person, label: 'Professor'),
+            MenuCard(
+              icon: Icons.bar_chart,
+              label: 'Relatórios',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RelatoriosPage(),
+                  ),
+                );
+              },
+            ),
+            MenuCard(
+              icon: Icons.info,
+              label: 'Sobre',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SobrePage(),
+                  ),
+                );
+              },
+            ),
+            MenuCard(
+              icon: Icons.person,
+              label: 'Professor',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfessorPage(),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
