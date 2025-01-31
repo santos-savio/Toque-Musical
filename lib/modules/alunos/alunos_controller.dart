@@ -17,21 +17,21 @@ class AlunosController {
     alunos.add(alunosList);
   }
 
-  Future<void> addAluno(String nome, int? turmaId) async {
+  Future<void> addAluno(String nome) async {
     final db = await database;
     await db.insert(
       'alunos',
-      {'nome': nome, 'turmaId': turmaId},
+      {'nome': nome},
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
     getAllAlunos();
   }
 
-  Future<void> editAluno(int id, String novoNome, int? novaTurmaId) async {
+  Future<void> editAluno(int id, String novoNome) async {
     final db = await database;
     await db.update(
       'alunos',
-      {'nome': novoNome, 'turmaId': novaTurmaId},
+      {'nome': novoNome},
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -46,13 +46,6 @@ class AlunosController {
       whereArgs: [id],
     );
     getAllAlunos();
-  }
-
-  Future<void> getAllTurmas() async {
-    final db = await database;
-    final result = await db.query('turmas');
-    final turmaList = result.map((a) => Turma.fromMap(a)).toList();
-    turmas.add(turmaList);
   }
 
   void dispose() {

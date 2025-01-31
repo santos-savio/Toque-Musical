@@ -25,13 +25,20 @@ class TurmasController {
     getAllTurmas();
   }
 
-  Future<void> deleteTurma(int id) async {
+  Future<void> deleteTurma(int turmaId) async {
     final db = await database;
+    await db.delete(
+      'alunoTurma',
+      where: 'turmaId = ?',
+      whereArgs: [turmaId],
+    );
+
     await db.delete(
       'turmas',
       where: 'id = ?',
-      whereArgs: [id],
+      whereArgs: [turmaId],
     );
+
     getAllTurmas();
   }
 

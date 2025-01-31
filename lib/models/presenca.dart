@@ -2,8 +2,8 @@ class Presenca {
   final int? id;
   final int alunoId;
   final int aulaId;
-  final bool presente;
-  final String? observacao;
+  bool presente;
+  String? observacao;
 
   Presenca({
     this.id,

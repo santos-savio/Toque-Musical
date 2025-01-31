@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'components/relatorio_de_aulas_page.dart';
-import 'components/relatorio_geral_aluno_page.dart';
+import 'components/relatorio_aulas/relatorio_aulas_page.dart';
+import 'components/relatorio_geral_aluno/relatorio_geral_aluno_page.dart';
 
 class RelatoriosPage extends StatelessWidget {
   const RelatoriosPage({super.key});
@@ -10,7 +10,9 @@ class RelatoriosPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Relatórios'),
+        leading: BackButton(color: Colors.white),
+        title: const Text('Relatórios', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -53,7 +55,7 @@ class RelatoriosPage extends StatelessWidget {
   void _navigateToRelatorioDeAulas(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const RelatorioDeAulasPage()),
+      MaterialPageRoute(builder: (context) => const RelatorioAulasPage()),
     );
   }
 

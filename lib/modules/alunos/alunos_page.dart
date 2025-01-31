@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../models/aluno.dart';
-import '../../models/turma.dart';
 import 'alunos_controller.dart';
 
 class AlunosPage extends StatefulWidget {
@@ -31,6 +30,7 @@ class _AlunosPageState extends State<AlunosPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Alunos'),
+        backgroundColor: Colors.blue,
       ),
       body: StreamBuilder<List<Aluno>>(
           stream: controller.alunos,
@@ -62,18 +62,13 @@ class _AlunosPageState extends State<AlunosPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.edit),
+                        icon: const Icon(Icons.edit, color: Colors.blue),
                         onPressed: () {
-                          _showEditAlunoDialog(
-                            context,
-                            aluno.id,
-                            aluno.nome,
-                            aluno.turmaId,
-                          );
+                          _showEditAlunoDialog(context, aluno.id, aluno.nome);
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.delete),
+                        icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () {
                           _showDeleteConfirmationDialog(aluno.id);
                         },
@@ -95,8 +90,6 @@ class _AlunosPageState extends State<AlunosPage> {
 
   void _showAddAlunoDialog() {
     final textController = TextEditingController();
-    Turma? turmaSelecionada;
-    controller.getAllTurmas();
     showDialog(
       context: context,
       builder: (context) {
@@ -109,25 +102,6 @@ class _AlunosPageState extends State<AlunosPage> {
               TextField(
                 controller: textController,
                 decoration: const InputDecoration(hintText: 'Nome do aluno'),
-              ),
-              StreamBuilder<List<Turma>>(
-                stream: controller.turmas,
-                builder: (context, snapshot) {
-                  return DropdownButtonFormField<Turma>(
-                    decoration: const InputDecoration(labelText: 'Turma'),
-                    items: snapshot.data?.map((e) {
-                      return DropdownMenuItem<Turma>(
-                        value: e,
-                        child: Text(e.nome),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        turmaSelecionada = value;
-                      });
-                    },
-                  );
-                },
               ),
             ],
           ),
@@ -142,7 +116,7 @@ class _AlunosPageState extends State<AlunosPage> {
               onPressed: () {
                 final nome = textController.text;
                 if (nome.isNotEmpty) {
-                  controller.addAluno(nome, turmaSelecionada?.id);
+                  controller.addAluno(nome);
                 }
                 Navigator.of(context).pop();
               },
@@ -154,11 +128,8 @@ class _AlunosPageState extends State<AlunosPage> {
     );
   }
 
-  void _showEditAlunoDialog(
-      BuildContext context, int id, String nomeAtual, int? turmaIdAtual) {
+  void _showEditAlunoDialog(BuildContext context, int id, String nomeAtual) {
     final textController = TextEditingController(text: nomeAtual);
-    controller.getAllTurmas();
-    Turma? turmaSelecionada;
     showDialog(
       context: context,
       builder: (context) {
@@ -173,32 +144,6 @@ class _AlunosPageState extends State<AlunosPage> {
                 decoration:
                     const InputDecoration(hintText: 'Novo nome do aluno'),
               ),
-              StreamBuilder<List<Turma>>(
-                stream: controller.turmas,
-                builder: (context, snapshot) {
-                  turmaSelecionada = turmaIdAtual == null
-                      ? null
-                      : snapshot.data?.cast<Turma?>().firstWhere(
-                            (element) => element?.id == turmaIdAtual,
-                            orElse: () => null,
-                          );
-                  return DropdownButtonFormField<Turma>(
-                    value: turmaSelecionada,
-                    decoration: const InputDecoration(labelText: 'Turma'),
-                    items: snapshot.data?.map((e) {
-                      return DropdownMenuItem<Turma>(
-                        value: e,
-                        child: Text(e.nome),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        turmaSelecionada = value;
-                      });
-                    },
-                  );
-                },
-              ),
             ],
           ),
           actions: [
@@ -212,7 +157,7 @@ class _AlunosPageState extends State<AlunosPage> {
               onPressed: () {
                 final novoNome = textController.text;
                 if (novoNome.isNotEmpty) {
-                  controller.editAluno(id, novoNome, turmaSelecionada?.id);
+                  controller.editAluno(id, novoNome);
                 }
                 Navigator.of(context).pop();
               },

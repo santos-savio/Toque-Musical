@@ -1,15 +1,13 @@
 class Aluno {
   final int id;
   final String nome;
-  final int? turmaId;
 
-  Aluno({required this.id, required this.nome, this.turmaId});
+  Aluno({required this.id, required this.nome});
 
   factory Aluno.fromMap(Map<String, dynamic> map) {
     return Aluno(
       id: map['id'],
       nome: map['nome'],
-      turmaId: map['turmaId'],
     );
   }
 
@@ -17,7 +15,6 @@ class Aluno {
     return {
       'id': id,
       'nome': nome,
-      'turmaId': turmaId,
     };
   }
 

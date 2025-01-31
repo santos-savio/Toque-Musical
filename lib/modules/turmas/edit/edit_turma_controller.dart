@@ -28,10 +28,16 @@ class EditTurmaController {
 
   Future<void> loadAlunos() async {
     final db = await database;
-    final result = await db.query(
-      'alunos',
-      where: 'turmaId = ?',
-      whereArgs: [_turma.id],
+    final result = await db.rawQuery(
+      '''
+      SELECT
+        a.id,
+        a.nome
+      FROM alunos a
+      INNER JOIN alunoTurma at ON at.alunoId = a.id
+      WHERE at.turmaId = ?
+    ''',
+      [_turma.id],
     );
 
     alunodaTurmaOriginal = result.map((r) => Aluno.fromMap(r)).toList();
@@ -40,9 +46,19 @@ class EditTurmaController {
 
   Future<void> loadAlunosDisponiveis() async {
     final db = await database;
-    final result = await db.query(
-      'alunos',
-      where: 'turmaId IS NULL',
+    final result = await db.rawQuery(
+      '''
+      SELECT
+        a.id,
+        a.nome
+      FROM alunos a
+      WHERE a.Id NOT IN (
+        SELECT at.alunoId
+        FROM alunoTurma at
+        WHERE at.turmaId = ?
+      )
+    ''',
+      [_turma.id],
     );
 
     alunosDisponiveisOriginal = result.map((r) => Aluno.fromMap(r)).toList();
@@ -95,12 +111,13 @@ class EditTurmaController {
 
   adicionarAlunosATurma() async {
     final db = await database;
-
     if (alunosAdicionados.isNotEmpty) {
-      await db.update(
-        'alunos',
-        {'turmaId': _turma.id},
-        where: 'id IN (${alunosAdicionados.join(',')})',
+      final values = alunosAdicionados
+          .map((alunoId) => '($alunoId, ${_turma.id})')
+          .join(',');
+
+      await db.rawInsert(
+        'INSERT INTO alunoTurma (alunoId, turmaId) VALUES $values',
       );
     }
   }
@@ -109,10 +126,11 @@ class EditTurmaController {
     final db = await database;
 
     if (alunosRemovidos.isNotEmpty) {
-      await db.update(
-        'alunos',
-        {'turmaId': null},
-        where: 'id IN (${alunosRemovidos.join(',')})',
+      final values = alunosRemovidos.map((alunoId) => '$alunoId').join(',');
+
+      await db.rawDelete(
+        'DELETE FROM alunoTurma WHERE alunoId IN ($values) AND turmaId = ?',
+        [_turma.id],
       );
     }
   }
