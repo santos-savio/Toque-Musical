@@ -18,7 +18,7 @@ class DatabaseHelper {
   static Future<Database> _initializeDatabase() async {
     final path = join(await getDatabasesPath(), 'toque_musical.db');
 
-    //await deleteDatabase(path);
+    // await deleteDatabase(path);
 
     return openDatabase(
       path,
@@ -32,8 +32,18 @@ class DatabaseHelper {
           '''
           CREATE TABLE alunos(
             id INTEGER PRIMARY KEY,
-            nome TEXT,
+            nome TEXT
+          )
+          ''',
+        );
+
+        await db.execute(
+          '''
+          CREATE TABLE alunoTurma(
+            alunoId INTEGER,
             turmaId INTEGER,
+            PRIMARY KEY(alunoId, turmaId),
+            FOREIGN KEY(alunoId) REFERENCES alunos(id),
             FOREIGN KEY(turmaId) REFERENCES turmas(id)
           )
           ''',
@@ -43,9 +53,11 @@ class DatabaseHelper {
           '''
           CREATE TABLE aulas(
             id INTEGER PRIMARY KEY,
-            descricao TEXT,
+            anotacao TEXT,
             date TEXT,
-            duration INTEGER
+            duration INTEGER,
+            turmaId INTEGER,
+            FOREIGN KEY(turmaId) REFERENCES turmas(id)
           )
           ''',
         );

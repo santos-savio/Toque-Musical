@@ -50,7 +50,7 @@ class _ProfessorPageState extends State<ProfessorPage> {
                 if (nomeController.text.isNotEmpty) {
                   await _controller.addProfessor(nomeController.text);
                   await _loadProfessores();
-                  Navigator.pop(context);
+                  Navigator.of(context).pop();
                 }
               },
               child: const Text('Salvar'),
@@ -86,7 +86,7 @@ class _ProfessorPageState extends State<ProfessorPage> {
                   await _controller.editProfessor(
                       professor.id!, nomeController.text);
                   await _loadProfessores();
-                  Navigator.pop(context);
+                  if (context.mounted) Navigator.of(context).pop();
                 }
               },
               child: const Text('Salvar'),
@@ -115,7 +115,7 @@ class _ProfessorPageState extends State<ProfessorPage> {
               onPressed: () async {
                 await _controller.deleteProfessor(id);
                 await _loadProfessores();
-                Navigator.pop(context);
+                if (context.mounted) Navigator.of(context).pop();
               },
               child: const Text('Excluir'),
             ),
@@ -128,7 +128,10 @@ class _ProfessorPageState extends State<ProfessorPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Professor')),
+      appBar: AppBar(
+        title: const Text('Professor'),
+        backgroundColor: Colors.teal,
+      ),
       body: ListView.builder(
         itemCount: _professores.length,
         itemBuilder: (context, index) {

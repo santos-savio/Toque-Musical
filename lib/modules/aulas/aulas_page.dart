@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' hide context;
-import 'package:sqflite/sqflite.dart';
+import 'package:intl/intl.dart';
+import 'package:toque_musical/modules/aulas/aulas_controller.dart';
+
+import '../../models/aula.dart';
+import '../../models/turma.dart';
 
 class AulasPage extends StatefulWidget {
   const AulasPage({super.key});
@@ -10,40 +13,12 @@ class AulasPage extends StatefulWidget {
 }
 
 class _AulasPageState extends State<AulasPage> {
-  late Database _database;
-  List<Map<String, dynamic>> _aulas = [];
+  final controller = AulasController();
 
   @override
   void initState() {
     super.initState();
-    _initDatabase();
-  }
-
-  Future<void> _initDatabase() async {
-    _database =
-        await openDatabase(join(await getDatabasesPath(), 'toque_musical.db'));
-    _fetchAulas();
-  }
-
-  Future<void> _fetchAulas() async {
-    final List<Map<String, dynamic>> aulas = await _database.query('aulas');
-    setState(() {
-      _aulas = aulas;
-    });
-  }
-
-  void _adicionarAula(Map<String, dynamic> novaAula) {
-    setState(() {
-      _aulas = List.from(_aulas)..add(novaAula);
-    });
-    Navigator.pop(context);
-  }
-
-  void _removerAula(int index) {
-    setState(() {
-      _aulas.removeAt(index);
-    });
-    Navigator.of(context).pop();
+    controller.obterAulas();
   }
 
   void _showDeleteConfirmationDialog(int id) {
@@ -59,7 +34,10 @@ class _AulasPageState extends State<AulasPage> {
               child: const Text('Cancelar'),
             ),
             TextButton(
-              onPressed: () => _removerAula(id),
+              onPressed: () {
+                controller.removerAula(id);
+                Navigator.of(context).pop();
+              },
               child: const Text('Excluir'),
             ),
           ],
@@ -68,10 +46,26 @@ class _AulasPageState extends State<AulasPage> {
     );
   }
 
-  void _mostrarAdicionarAulaModal() {
-    final TextEditingController descricaoController = TextEditingController();
+  void _mostrarAulaModal([Aula? aula]) {
+    final anotacaoController = TextEditingController();
+
     String? duracao = '45';
     DateTime? dataSelecionada;
+    var titulo = 'Adicionar Aula';
+    var botao = 'Adicionar';
+    Turma? turmaSelecionada;
+    int? turmaId;
+
+    if (aula != null) {
+      anotacaoController.text = aula.anotacao;
+      duracao = aula.duration.toString();
+      dataSelecionada = DateTime.parse(aula.date);
+      titulo = 'Editar Aula';
+      botao = 'Salvar';
+      turmaId = aula.turmaId;
+    }
+
+    controller.getAllTurmas();
 
     showDialog(
       context: context,
@@ -79,7 +73,7 @@ class _AulasPageState extends State<AulasPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Adicionar Aula'),
+              title: Text(titulo),
               content: SingleChildScrollView(
                 child: Column(
                   spacing: 12,
@@ -88,8 +82,8 @@ class _AulasPageState extends State<AulasPage> {
                     ListTile(
                       title: Text(
                         dataSelecionada == null
-                            ? 'Selecione a Data'
-                            : 'Data: ${dataSelecionada!.day.toString().padLeft(2, '0')}/${dataSelecionada!.month.toString().padLeft(2, '0')}/${dataSelecionada!.year}',
+                            ? 'Selecione a data e hora'
+                            : '${dataSelecionada!.day.toString().padLeft(2, '0')}/${dataSelecionada!.month.toString().padLeft(2, '0')}/${dataSelecionada!.year} - ${dataSelecionada!.hour.toString().padLeft(2, '0')}:${dataSelecionada!.minute.toString().padLeft(2, '0')}',
                       ),
                       trailing: const Icon(Icons.calendar_today),
                       onTap: () async {
@@ -99,10 +93,24 @@ class _AulasPageState extends State<AulasPage> {
                           firstDate: DateTime(2000),
                           lastDate: DateTime(2100),
                         );
+
                         if (pickedDate != null) {
-                          setState(() {
-                            dataSelecionada = pickedDate;
-                          });
+                          final pickedTime = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          );
+
+                          if (pickedTime != null) {
+                            setState(() {
+                              dataSelecionada = DateTime(
+                                pickedDate.year,
+                                pickedDate.month,
+                                pickedDate.day,
+                                pickedTime.hour,
+                                pickedTime.minute,
+                              );
+                            });
+                          }
                         }
                       },
                     ),
@@ -130,12 +138,38 @@ class _AulasPageState extends State<AulasPage> {
                         });
                       },
                     ),
+                    StreamBuilder<List<Turma>>(
+                      stream: controller.turmas,
+                      builder: (context, snapshot) {
+                        final turma = snapshot.data?.where(
+                          (element) => element.id == turmaId,
+                        );
+
+                        if (turma != null && turma.isNotEmpty) {
+                          turmaSelecionada = turma.first;
+                        }
+
+                        return DropdownButtonFormField<Turma>(
+                          value: turmaSelecionada,
+                          decoration: const InputDecoration(labelText: 'Turma'),
+                          items: snapshot.data?.map((e) {
+                            return DropdownMenuItem<Turma>(
+                              value: e,
+                              child: Text(e.nome),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            turmaSelecionada = value;
+                          },
+                        );
+                      },
+                    ),
                     TextField(
-                      controller: descricaoController,
+                      controller: anotacaoController,
                       maxLength: 350,
                       maxLines: 2,
                       decoration: const InputDecoration(
-                        labelText: 'Descrição',
+                        labelText: 'Anotação',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -149,16 +183,23 @@ class _AulasPageState extends State<AulasPage> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (dataSelecionada != null &&
-                        descricaoController.text.isNotEmpty) {
-                      _adicionarAula({
-                        'descricao': descricaoController.text,
-                        'data': dataSelecionada,
-                        'duracao': duracao,
-                      });
+                    if (anotacaoController.text.isNotEmpty) {
+                      final aulaModel = Aula(
+                        id: aula?.id,
+                        anotacao: anotacaoController.text,
+                        date: dataSelecionada!.toIso8601String(),
+                        duration: int.parse(duracao!),
+                        turmaId: turmaSelecionada?.id,
+                      );
+                      if (aula == null) {
+                        controller.adicionarAula(aulaModel);
+                      } else {
+                        controller.editarAula(aulaModel);
+                      }
+                      Navigator.pop(context);
                     }
                   },
-                  child: const Text('Adicionar'),
+                  child: Text(botao),
                 ),
               ],
             );
@@ -173,27 +214,47 @@ class _AulasPageState extends State<AulasPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Aulas'),
+        backgroundColor: Colors.orange,
       ),
-      body: _aulas.isEmpty
-          ? const Center(child: Text('Nenhuma aula cadastrada'))
-          : ListView.builder(
-              itemCount: _aulas.length,
+      body: StreamBuilder<List<Aula>>(
+          stream: controller.aulas,
+          builder: (context, snapshot) {
+            if (snapshot.data == null ||
+                snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text('Erro: ${snapshot.error}'));
+            }
+
+            if (snapshot.data!.isEmpty) {
+              return const Center(child: Text('Nenhum aula cadastrado'));
+            }
+
+            final alunos = snapshot.data!;
+            return ListView.builder(
+              itemCount: alunos.length,
               itemBuilder: (context, index) {
-                final aula = _aulas[index];
-                final data = aula['data'] as DateTime;
-                final formatedDate =
-                    '${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}/${data.year}';
+                final aula = alunos[index];
+                final formatedDate = DateFormat('dd/MM/yyyy HH:mm')
+                    .format(DateTime.parse(aula.date));
                 return ListTile(
                   leading: Icon(
                     Icons.calendar_today,
                     color: Theme.of(context).primaryColor,
                   ),
-                  title: Text(aula['descricao']),
-                  subtitle: Row(
+                  title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(formatedDate),
-                      Text('${aula['duracao']} min'),
+                      Text('${aula.duration} min'),
+                    ],
+                  ),
+                  subtitle: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(aula.anotacao),
+                      Text(aula.turmaNome ?? 'Turma Desconhecida'),
                     ],
                   ),
                   trailing: Row(
@@ -202,20 +263,22 @@ class _AulasPageState extends State<AulasPage> {
                       IconButton(
                         icon: const Icon(Icons.edit, color: Colors.blue),
                         onPressed: () {
-                          // Função de edição pode ser implementada
+                          _mostrarAulaModal(aula);
                         },
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _showDeleteConfirmationDialog(index),
+                        onPressed: () =>
+                            _showDeleteConfirmationDialog(aula.id!),
                       ),
                     ],
                   ),
                 );
               },
-            ),
+            );
+          }),
       floatingActionButton: FloatingActionButton(
-        onPressed: _mostrarAdicionarAulaModal,
+        onPressed: _mostrarAulaModal,
         child: const Icon(Icons.add),
       ),
     );

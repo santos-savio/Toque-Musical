@@ -35,20 +35,21 @@ class _SobrePageState extends State<SobrePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 30),
             const Text(
               "Este aplicativo foi criado com o intuito de auxiliar o projeto Toque Musical a gerenciar as aulas e gerar relatórios para demonstração dos resultados.",
               style: TextStyle(fontSize: 16),
-              textAlign: TextAlign.left,
+              textAlign: TextAlign.justify,
             ),
-            const SizedBox(height: 20),
+            const Spacer(),
             const Center(
               child: Text(
-                "Desenvolvido por Sávio Gabriel Santos\ne Emerson Ricardo Monteiro.",
+                "Desenvolvido por:\n\nSávio Gabriel Santos\nEmerson Ricardo Monteiro.",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
             ),
-            const SizedBox(height: 20),
+            const Spacer(),
             const Divider(thickness: 1),
             Padding(
               padding: const EdgeInsets.only(top: 10.0),
