@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../../models/relatorio_aulas.dart';
+import '../../gerar_relatorio_pdf/gerar_relatorio_pdf.dart';
+import 'resultado_relatorio_pdf.dart';
 
 class ResultadoRelatorioPage extends StatelessWidget {
   final Future<List<RelatorioAula>> relatorio;
@@ -33,7 +35,10 @@ class ResultadoRelatorioPage extends StatelessWidget {
                     }
 
                     if (snapshot.hasError) {
-                      return Center(child: Text('Erro: ${snapshot.error}'));
+                      return Center(
+                        child: Text(
+                            'Ocorreu um erro inesperado, tente novamente ou entre em contato com o suporte'),
+                      );
                     }
 
                     if (snapshot.data!.isEmpty) {
@@ -125,6 +130,35 @@ class ResultadoRelatorioPage extends StatelessWidget {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          _mostrarCarregando(context);
+          await gerarRelatorioPDF(resultadoRelatorioPDF(await relatorio));
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+        },
+        child: const Icon(Icons.print),
+      ),
+    );
+  }
+
+  void _mostrarCarregando(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text("Gerando relatório..."),
+            ],
+          ),
+        );
+      },
     );
   }
 }
