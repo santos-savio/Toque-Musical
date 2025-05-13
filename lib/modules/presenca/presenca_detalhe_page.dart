@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:toque_musical/models/aluno.dart';
 
 import '../../models/presenca.dart';
 import 'presenca_controller.dart';
+import 'package:toque_musical/modules/alunos/alunos_controller.dart';
 
 class PresencaDetalhePage extends StatefulWidget {
   final PresencaController controller;
+  final AlunosController alunosController;
   final int aulaId;
 
   const PresencaDetalhePage(
-      {super.key, required this.controller, required this.aulaId});
+      {super.key,
+        required this.controller,
+        required this.aulaId,
+        required this.alunosController
+      });
 
   @override
   State<PresencaDetalhePage> createState() => _PresencaDetalhePageState();
@@ -39,7 +46,17 @@ class _PresencaDetalhePageState extends State<PresencaDetalhePage> {
                     });
                   },
                 ),
-                title: Text("Aluno ID: ${presenca.alunoId}"),
+                title: FutureBuilder<Aluno?>(
+                    future: widget.alunosController.getAlunoById(presenca.alunoId),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Text("Aluno: ${snapshot.data!.nome}");
+                      }
+                      return const Text('Carregando...');
+                    },
+                    ),
+
+
                 trailing: IconButton(
                   icon: Icon(Icons.chat_bubble_outline),
                   onPressed: () =>

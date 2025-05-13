@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:toque_musical/modules/alunos/alunos_controller.dart';
 
 import '../../models/aula.dart';
 import 'presenca_controller.dart';
@@ -14,6 +15,7 @@ class PresencaPage extends StatefulWidget {
 
 class _PresencaPageState extends State<PresencaPage> {
   final controller = PresencaController();
+  final alunosController = AlunosController();
 
   @override
   void initState() {
@@ -65,7 +67,9 @@ class _PresencaPageState extends State<PresencaPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => PresencaDetalhePage(
-                          controller: controller, aulaId: aula.id!),
+                          controller: controller,
+                          alunosController: AlunosController(),
+                          aulaId: aula.id!),
                     ),
                   );
                 },

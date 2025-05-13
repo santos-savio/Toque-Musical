@@ -17,6 +17,19 @@ class AlunosController {
     alunos.add(alunosList);
   }
 
+  Future<Aluno?> getAlunoById(int id) async {
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query(
+      'alunos',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    if (result.isNotEmpty) {
+      return Aluno.fromMap(result.first);
+    }
+    return null;
+  }
   Future<void> addAluno(String nome) async {
     final db = await database;
     await db.insert(
